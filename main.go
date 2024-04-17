@@ -10,21 +10,23 @@ import (
 	"github.com/armarquez/gather-code/version"
 )
 
-var debug bool
+var (
+	inputPath   string
+	outputFile  string
+	extensions  string
+	versionFlag bool
+	debug       bool
+)
 
-func main() {
-	var (
-		inputPath   string
-		outputFile  string
-		extensions  string
-		versionFlag bool
-	)
-
-	// Define command-line flags
-	flag.StringVar(&inputPath, "input-path", ".", "Path to traverse for code files")
+func init() {
+	flag.StringVar(&inputPath, "input-path", "", "Path to traverse for code files")
+	flag.StringVar(&inputPath, "i", "", "Path to traverse for code files (shorthand)")
 	flag.StringVar(&outputFile, "output-file", "", "Output file path (default is standard output)")
+	flag.StringVar(&outputFile, "o", "", "Output file path (shorthand)")
 	flag.StringVar(&extensions, "extensions", "go", "Comma-separated list of file extensions to search (default is 'go')")
+	flag.StringVar(&extensions, "e", "go", "Comma-separated list of file extensions to search (shorthand)")
 	flag.BoolVar(&versionFlag, "version", false, "Print version information and exit")
+	flag.BoolVar(&versionFlag, "v", false, "Print version information and exit")
 	flag.BoolVar(&debug, "debug", false, "Enable debug mode to print file paths and decisions")
 	flag.Parse()
 
@@ -34,15 +36,25 @@ func main() {
 		fmt.Println("Version:", version.Version)
 		fmt.Println("Go Version:", version.GoVersion)
 		fmt.Println("OS / Arch:", version.OsArch)
-		return
+		os.Exit(0)
 	}
 
+	if inputPath == "" {
+		fmt.Fprintln(os.Stderr, "Error: input-path is required")
+		flag.Usage()
+		os.Exit(1)
+	}
+}
+
+func main() {
 	// Define the file extensions to look for
 	var extList []string
 	if extensions != "" {
 		extList = strings.Split(extensions, ",")
 	}
-	fmt.Printf("Extensions: %v\n", extList)
+	if debug {
+		fmt.Printf("Extensions: %v\n", extList)
+	}
 
 	// Open output file or use standard output
 	var out *os.File
