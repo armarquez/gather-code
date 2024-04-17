@@ -1,0 +1,2 @@
+This is a test file for copy file contents.
+It has multiple lines.
