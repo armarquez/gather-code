@@ -131,6 +131,6 @@ func copyFileContents(out *os.File, filePath string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(out, "```")
+	fmt.Fprintln(out, "\n```")
 	return nil
 }
